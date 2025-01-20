@@ -1,0 +1,1 @@
+D:\MAn\BlindAssistant\BlindAssistant\NicolaBlindAssistant\NicolaBlindAssistant\NicolaBlindAssistant.csproj;x64

@@ -1,0 +1,80 @@
+﻿<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:NicolaBlindAssistant.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="NicolaBlindAssistant.Views.MainPage"
+             Title="Nicola Blind Assistant">
+
+    <ContentPage.BindingContext>
+        <vm:ModeViewModel />
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="Auto, *, Auto">
+        <!-- Верхня панель -->
+        <Grid BackgroundColor="#1A1A1A" Padding="10" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Text="☰" Clicked="OnMenuClicked" Grid.Column="0" BackgroundColor="Transparent" TextColor="White" />
+            <Label Text="Nicola Blind Assistant" FontSize="24" TextColor="White"
+                   HorizontalOptions="Center" VerticalOptions="Center" Grid.Column="1" />
+            <Button Text="ℹ" Clicked="OnInfoClicked" Grid.Column="2" BackgroundColor="Transparent" TextColor="White" />
+        </Grid>
+
+        <!-- Основний екран -->
+        <Grid Grid.Row="1" BackgroundColor="Black">
+            <!-- Камера -->
+            <toolkit:CameraView 
+                x:Name="Camera"
+                HorizontalOptions="FillAndExpand"
+                VerticalOptions="FillAndExpand"
+                ZoomFactor="{Binding CurrentZoom, Mode=TwoWay}"
+                SelectedCamera="{Binding SelectedCamera}"
+                IsVisible="{Binding IsCameraVisible}">
+                <toolkit:CameraView.GestureRecognizers>
+                    <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                </toolkit:CameraView.GestureRecognizers>
+            </toolkit:CameraView>
+
+            <!-- Слайдер для масштабування -->
+            <Slider 
+                x:Name="ZoomSlider"
+                VerticalOptions="End"
+                HorizontalOptions="Fill"
+                Maximum="{Binding Source={x:Reference Camera}, Path=SelectedCamera.MaximumZoomFactor, FallbackValue=5}"
+                Minimum="{Binding Source={x:Reference Camera}, Path=SelectedCamera.MinimumZoomFactor, FallbackValue=1}"
+                ValueChanged="OnZoomSliderValueChanged"
+                IsVisible="{Binding IsMagnifierMode}" />
+
+            <!-- Поле вводу та кнопка для Text-to-Speech -->
+            <StackLayout Padding="10" Spacing="10" VerticalOptions="Center" IsVisible="False">
+                <StackLayout.Triggers>
+                    <DataTrigger TargetType="StackLayout" Binding="{Binding CurrentMode}" Value="Text to Speech">
+                        <Setter Property="IsVisible" Value="True" />
+                    </DataTrigger>
+                </StackLayout.Triggers>
+
+                <Entry Text="{Binding TtsInputText}" Placeholder="Введіть текст для озвучення"
+                       TextColor="White" BackgroundColor="Gray" />
+                <Button Text="Озвучити текст" Command="{Binding ExecuteCurrentModeCommand}" />
+            </StackLayout>
+        </Grid>
+
+        <!-- Панель інструментів -->
+        <ScrollView Grid.Row="2" Orientation="Horizontal" BackgroundColor="#333">
+            <StackLayout Orientation="Horizontal" Padding="10" Spacing="5">
+                <Button Text="Розпізнавання за допомогою ШІ" Command="{Binding SetModeCommand}" CommandParameter="AI Recognize" Clicked="onAIRecognize"/>
+                <Button Text="Текст в голос" Command="{Binding SetModeCommand}" CommandParameter="Text to Speech" Clicked="onTextToSpeech"/>
+                <Button Text="Голос в текст" Command="{Binding SetModeCommand}" CommandParameter="Speech to Text" Clicked="OnSpeechToTextClicked" />
+                <Button Text="Збільшуване скло" Command="{Binding SetModeCommand}" CommandParameter="Magnifier" Clicked="OnMagnifierClicked" />
+                <Button Text="Розпізнавання грошей" Command="{Binding SetModeCommand}" CommandParameter="Money Recognition" />
+                <Button Text="Оптичне розпізнавання тексту" Command="{Binding SetModeCommand}" CommandParameter="OCR" />
+                <Button Text="Розпізнавання облич" Command="{Binding SetModeCommand}" CommandParameter="Face Recognition" />
+                <Button Text="Компас" Command="{Binding SetModeCommand}" CommandParameter="Compass" />
+            </StackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>
